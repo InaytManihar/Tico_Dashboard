@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TICO – Project Timeline</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap');
+:root{--bg:#f4f6fb;--white:#fff;--border:#e4e8f0;--text:#0f1623;--muted:#8492a6;--muted2:#b0bac9;--accent:#2563eb;--accent-light:#eff4ff;--green:#10b981;--green-light:#ecfdf5;--amber:#f59e0b;--amber-light:#fffbeb;--red:#ef4444;--red-light:#fef2f2;--shadow-sm:0 1px 3px rgba(15,22,35,.06),0 1px 2px rgba(15,22,35,.04)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh}
+.navbar{height:62px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:200;box-shadow:var(--shadow-sm)}
+.nav-brand{display:flex;align-items:center;gap:11px}
+.roswalt-logo{flex-shrink:0}
+.nav-titles{display:flex;flex-direction:column;gap:1px}
+.roswalt-text{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;letter-spacing:.18em;color:#b8860b}
+.roswalt-text span{color:#8b6508;letter-spacing:.14em;font-size:9px;font-weight:600}
+.nav-logo{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:var(--text)}
+.nav-logo span{color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:14px}
+.nav-live{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 13px;border-radius:999px}
+.nav-live::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-time{font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.nav-sync{font-size:11px;color:var(--muted2);font-weight:500}
+.layout{display:grid;grid-template-columns:285px 1fr;min-height:calc(100vh - 62px)}
+.sidebar{background:var(--white);border-right:1px solid var(--border);padding:26px 18px;display:flex;flex-direction:column}
+.sidebar-title{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:16px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+.filter-block{margin-bottom:15px}
+.filter-lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.filter-sel{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238492a6' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:border-color .2s}
+.filter-sel:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);background-color:var(--white)}
+.filter-sel:disabled{opacity:.45;cursor:not-allowed}
+.loader-wrap{text-align:center;padding:20px 0}
+.spin{width:24px;height:24px;margin:0 auto 10px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-wrap p{font-size:12px;color:var(--muted);font-weight:500}
+.info-box{margin-top:auto;padding-top:18px;border-top:1px solid var(--border)}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.info-row:last-child{border-bottom:none}
+.info-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.info-val{font-size:13px;font-weight:800}
+.info-val.green{color:var(--green)}.info-val.amber{color:var(--amber)}.info-val.def{color:var(--text)}
+.main{padding:32px 36px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;gap:14px;text-align:center}
+.empty-state .ei{font-size:62px;opacity:.18}
+.empty-state .et{font-size:17px;font-weight:700;color:var(--text)}
+.empty-state .es{font-size:13px;color:var(--muted);max-width:300px;line-height:1.65}
+.table-card{background:var(--white);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.table-top{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.table-heading{font-size:15px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif}
+.count-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
+table{width:100%;border-collapse:collapse}
+thead th{padding:10px 15px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--border);white-space:nowrap}
+thead th.c{text-align:center}thead th.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f7f9fd}
+tbody tr.gsep td{border-top:2px solid var(--border)}
+td{padding:12px 15px;font-size:13px;vertical-align:middle}
+td.c{text-align:center}td.r{text-align:right}
+.srno{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--muted2)}
+.pname{font-weight:800;font-size:14px;color:var(--text)}
+.pcat{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--accent-light);color:var(--accent);white-space:nowrap}
+.ftag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;background:#eef2ff;color:#4f6ef7;white-space:nowrap}
+.pill{display:inline-block;padding:5px 13px;border-radius:8px;font-weight:700;font-size:13px;white-space:nowrap}
+.pill.a{background:var(--amber-light);color:var(--amber)}
+.pill.r{background:var(--red-light);color:var(--red)}
+.ttot{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:var(--accent);line-height:1}
+.tsub{font-size:10px;color:var(--muted);margin-top:2px;font-weight:500}
+.dash{color:var(--muted2);font-size:18px}
+.no-data{text-align:center;padding:52px;color:var(--muted);font-size:14px;font-weight:500}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--border)}.navbar,.main{padding-left:18px;padding-right:18px}.main{padding-top:22px;padding-bottom:22px}}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="roswalt-logo">
+      <img src="https://i.ibb.co/BHfG2RdC/LOGO-removebg-preview.png" alt="Roswalt Realty" style="height:46px;width:46px;object-fit:contain;"/>
+    </div>
+    <div class="nav-titles">
+      <div class="roswalt-text">ROSWALT <span>REALTY</span></div>
+      <div class="nav-logo">TICO <span>/</span> SHEET</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-sync" id="syncLabel"></span>
+    <div class="nav-live" id="liveStatus" style="background:var(--bg);color:var(--muted)">Connecting…</div>
+    <div class="nav-time" id="clockEl">--:--:--</div>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Filters</div>
+
+    <div class="loader-wrap" id="sideLoader">
+      <div class="spin"></div>
+      <p>Connecting to Google Sheets…</p>
+    </div>
+
+    <div id="filterWrap" style="display:none">
+      <div class="filter-block">
+        <label class="filter-lbl">Category</label>
+        <select class="filter-sel" id="catSel" onchange="calculate()">
+          <option value="">All Categories</option>
+        </select>
+      </div>
+      <div class="filter-block">
+        <label class="filter-lbl">Building Floors</label>
+        <select class="filter-sel" id="floorSel" onchange="calculate()">
+          <option value="">All Floors</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <div class="info-row"><span class="info-lbl">Total Projects</span><span class="info-val green" id="iTotal">—</span></div>
+      <div class="info-row"><span class="info-lbl">Categories</span><span class="info-val def" id="iCats">—</span></div>
+      <div class="info-row"><span class="info-lbl">Floor Types</span><span class="info-val amber" id="iFloors">—</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="empty-state" id="emptyState">
+      <div class="ei">🏗️</div>
+      <div class="et">Loading your projects…</div>
+      <div class="es">Connecting to Google Sheets. Data will appear instantly.</div>
+    </div>
+    <div id="results" style="display:none">
+      <div class="table-card">
+        <div class="table-top">
+          <div class="table-heading">Projects <span class="count-badge" id="projCount">0</span></div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Sr No</th>
+              <th>Project</th>
+              <th>Category</th>
+              <th class="c">Floors</th>
+              <th class="c">DA → Launch</th>
+              <th class="c">Launch → OC</th>
+              <th class="r">Total Duration</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div class="no-data" id="noData" style="display:none">No matching projects found.</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const SHEET='https://script.google.com/macros/s/AKfycbyX2CivLHJlgsGUVF_qJEq6_hU2zgmZFk1zV0LJR2AyqCdB8K-IoY9OyY5WlT2-QAr-/exec';
+const REFRESH_MS=3000;
+let projects=[],lastSig=null;
+
+setInterval(()=>{document.getElementById('clockEl').textContent=new Date().toLocaleTimeString('en-IN',{hour12:false})},1000);
+
+async function loadData(silent=false){
+  try{
+    const res=await fetch(SHEET+'?t='+Date.now());
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const raw=await res.json();
+    const sig=JSON.stringify(raw);
+    if(sig!==lastSig){
+      lastSig=sig;
+      parse(raw);drops();info();calculate();
+    }
+    setLive(true);
+    document.getElementById('sideLoader').style.display='none';
+    document.getElementById('filterWrap').style.display='block';
+    document.getElementById('syncLabel').textContent='Synced '+ts();
+  }catch(e){
+    setLive(false);
+    document.getElementById('sideLoader').style.display='none';
+    document.getElementById('filterWrap').style.display='block';
+    console.error(e);
+  }
+}
+
+function parse(raw){
+  if(!raw||raw.length<3)return;
+  const fc={};
+  (raw[1]||[]).forEach((c,i)=>{const m=String(c).toUpperCase().match(/(\d+)\s*FLOOR/);if(m)fc[i]=+m[1];});
+  projects=[];
+  for(let r=2;r<raw.length;r++){
+    const c=raw[r];
+    const sr=String(c[0]||'').trim(),name=String(c[1]||'').trim(),cat=String(c[2]||'').trim(),dr=String(c[3]||'').trim();
+    if(!name||!cat)continue;
+    const da=dr?parseInt(dr.replace(/\D/g,''))||0:0;
+    const fl={};
+    Object.entries(fc).forEach(([i,n])=>{const v=parseInt(String(c[+i]||'').replace(/\D/g,''));if(v>0)fl[n]=v;});
+
+    // FIX 2: Skip projects that have no floors data AND no total duration possible
+    // Only include projects that have at least one valid floor entry (meaning total duration exists)
+    if(!Object.keys(fl).length)continue;
+
+    projects.push({sr,name,category:cat,da,floors:fl});
+  }
+}
+
+function drops(){
+  const cats=[...new Set(projects.map(p=>p.category))].sort();
+  const fls=[...new Set(projects.flatMap(p=>Object.keys(p.floors).map(Number)))].sort((a,b)=>a-b);
+  const cs=document.getElementById('catSel'),fs=document.getElementById('floorSel');
+  const pc=cs.value,pf=fs.value;
+  cs.innerHTML='<option value="">All Categories</option>';
+  fs.innerHTML='<option value="">All Floors</option>';
+  cats.forEach(c=>{const o=new Option(c,c);if(c===pc)o.selected=true;cs.appendChild(o);});
+  fls.forEach(f=>{const o=new Option(f+' Floors',f);if(f==pf)o.selected=true;fs.appendChild(o);});
+}
+
+function info(){
+  document.getElementById('iTotal').textContent=projects.length;
+  document.getElementById('iCats').textContent=new Set(projects.map(p=>p.category)).size;
+  document.getElementById('iFloors').textContent=new Set(projects.flatMap(p=>Object.keys(p.floors).map(Number))).size;
+}
+
+function tcell(da,fd){
+  if(da&&fd) return`<div class="ttot">${da+fd}</div><div class="tsub">days</div>`;
+  if(da)     return`<div class="ttot">${da}</div><div class="tsub">days</div>`;
+  if(fd)     return`<div class="ttot">${fd}</div><div class="tsub">days</div>`;
+  return`<span class="dash">—</span>`;
+}
+const dac=da=>da?`<span class="pill a">${da} days</span>`:`<span class="dash">—</span>`;
+const occ=fd=>fd?`<span class="pill r">${fd} days</span>`:`<span class="dash">—</span>`;
+const fc2=f=>f?`<span class="ftag">${f} Floors</span>`:`<span class="dash">—</span>`;
+
+function calculate(){
+  const cat=document.getElementById('catSel').value;
+  const floor=parseInt(document.getElementById('floorSel').value)||null;
+
+  let filtered=[...projects];
+  if(cat) filtered=filtered.filter(p=>p.category===cat);
+
+  // FIX 1: When floor filter is selected, only show projects that HAVE that exact floor
+  if(floor) filtered=filtered.filter(p=>p.floors.hasOwnProperty(floor));
+
+  if(!filtered.length){
+    document.getElementById('emptyState').style.display='flex';
+    document.getElementById('emptyState').querySelector('.et').textContent='No projects found';
+    document.getElementById('emptyState').querySelector('.es').textContent='Try a different filter combination';
+    document.getElementById('results').style.display='none';
+    return;
+  }
+
+  const tbody=document.getElementById('tbody');
+  tbody.innerHTML='';
+  let rc=0;
+
+  filtered.forEach((p,pi)=>{
+    if(floor){
+      // Floor selected: show only that floor row
+      const fd=p.floors[floor];
+      const tr=document.createElement('tr');
+      if(pi>0)tr.classList.add('gsep');
+      tr.innerHTML=`<td><span class="srno">${p.sr}</span></td><td><div class="pname">${p.name}</div></td><td><span class="pcat">${p.category}</span></td><td class="c">${fc2(floor)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${tcell(p.da,fd)}</td>`;
+      tbody.appendChild(tr);rc++;
+    } else {
+      // No floor filter: show all floor rows for each project
+      const fks=Object.keys(p.floors).map(Number).sort((a,b)=>a-b);
+      fks.forEach((f,fi)=>{
+        const fd=p.floors[f];
+        const tr=document.createElement('tr');
+        if(fi===0&&pi>0)tr.classList.add('gsep');
+        tr.innerHTML=`<td>${fi===0?`<span class="srno">${p.sr}</span>`:''}</td><td>${fi===0?`<div class="pname">${p.name}</div>`:''}</td><td>${fi===0?`<span class="pcat">${p.category}</span>`:''}</td><td class="c">${fc2(f)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${tcell(p.da,fd)}</td>`;
+        tbody.appendChild(tr);rc++;
+      });
+    }
+  });
+
+  document.getElementById('noData').style.display=rc?'none':'block';
+  document.getElementById('projCount').textContent=filtered.length;
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('results').style.display='block';
+}
+
+function setLive(ok){const el=document.getElementById('liveStatus');if(ok){el.textContent='Live';el.style.background='var(--green-light)';el.style.color='var(--green)';}else{el.textContent='Offline';el.style.background='var(--red-light)';el.style.color='var(--red)';}}
+function ts(){return new Date().toLocaleTimeString('en-IN',{hour12:false});}
+
+loadData();
+setInterval(()=>loadData(true),REFRESH_MS);
+</script>
+</body>
+</html>
