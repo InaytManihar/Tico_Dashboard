@@ -11,7 +11,6 @@
 body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh}
 .navbar{height:62px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:200;box-shadow:var(--shadow-sm)}
 .nav-brand{display:flex;align-items:center;gap:11px}
-.roswalt-logo{flex-shrink:0}
 .nav-titles{display:flex;flex-direction:column;gap:1px}
 .roswalt-text{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;letter-spacing:.18em;color:#b8860b}
 .roswalt-text span{color:#8b6508;letter-spacing:.14em;font-size:9px;font-weight:600}
@@ -30,7 +29,6 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .filter-lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
 .filter-sel{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238492a6' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:border-color .2s}
 .filter-sel:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);background-color:var(--white)}
-.filter-sel:disabled{opacity:.45;cursor:not-allowed}
 .loader-wrap{text-align:center;padding:20px 0}
 .spin{width:24px;height:24px;margin:0 auto 10px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -60,7 +58,6 @@ tbody tr:hover{background:#f7f9fd}
 tbody tr.gsep td{border-top:2px solid var(--border)}
 td{padding:12px 15px;font-size:13px;vertical-align:middle}
 td.c{text-align:center}td.r{text-align:right}
-.srno{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--muted2)}
 .pname{font-weight:800;font-size:14px;color:var(--text)}
 .pcat{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--accent-light);color:var(--accent);white-space:nowrap}
 .ftag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;background:#eef2ff;color:#4f6ef7;white-space:nowrap}
@@ -96,12 +93,10 @@ td.c{text-align:center}td.r{text-align:right}
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-title">Filters</div>
-
     <div class="loader-wrap" id="sideLoader">
       <div class="spin"></div>
       <p>Connecting to Google Sheets…</p>
     </div>
-
     <div id="filterWrap" style="display:none">
       <div class="filter-block">
         <label class="filter-lbl">Category</label>
@@ -116,7 +111,6 @@ td.c{text-align:center}td.r{text-align:right}
         </select>
       </div>
     </div>
-
     <div class="info-box">
       <div class="info-row"><span class="info-lbl">Total Projects</span><span class="info-val green" id="iTotal">—</span></div>
       <div class="info-row"><span class="info-lbl">Categories</span><span class="info-val def" id="iCats">—</span></div>
@@ -138,7 +132,6 @@ td.c{text-align:center}td.r{text-align:right}
         <table>
           <thead>
             <tr>
-              <th>Sr No</th>
               <th>Project</th>
               <th>Category</th>
               <th class="c">Floors</th>
@@ -162,7 +155,7 @@ let projects=[],lastSig=null;
 
 setInterval(()=>{document.getElementById('clockEl').textContent=new Date().toLocaleTimeString('en-IN',{hour12:false})},1000);
 
-async function loadData(silent=false){
+async function loadData(){
   try{
     const res=await fetch(SHEET+'?t='+Date.now());
     if(!res.ok)throw new Error('HTTP '+res.status);
@@ -170,7 +163,10 @@ async function loadData(silent=false){
     const sig=JSON.stringify(raw);
     if(sig!==lastSig){
       lastSig=sig;
-      parse(raw);drops();info();calculate();
+      parse(raw);
+      drops();
+      info();
+      calculate();
     }
     setLive(true);
     document.getElementById('sideLoader').style.display='none';
@@ -184,24 +180,51 @@ async function loadData(silent=false){
   }
 }
 
+function normalize(s){
+  return String(s||'').toUpperCase().replace(/\s+/g,' ').trim();
+}
+
 function parse(raw){
-  if(!raw||raw.length<3)return;
-  const fc={};
-  (raw[1]||[]).forEach((c,i)=>{const m=String(c).toUpperCase().match(/(\d+)\s*FLOOR/);if(m)fc[i]=+m[1];});
+  if(!raw||raw.length<2)return;
+
+  // Row 0 = main headers, Row 1 = sub-headers (floor labels)
+  const mainHeaders = (raw[0]||[]).map(h=>normalize(h));
+  const subHeaders  = (raw[1]||[]).map(h=>normalize(h));
+
+  // Find column indexes by header name
+  const colName = mainHeaders.indexOf('PROJECT');
+  const colCat  = mainHeaders.indexOf('CATEGORY');
+  const colDA   = mainHeaders.findIndex(h=>h.includes('DA') && h.includes('LAUNCH'));
+  const colTot  = mainHeaders.findIndex(h=>h.includes('TOTAL') && h.includes('DURATION'));
+
+  // Find floor columns from sub-headers (row 1): "14 FLOORS", "22 FLOORS", "40 FLOORS" etc.
+  const floorCols = {}; // { floorNumber: colIndex }
+  subHeaders.forEach((h,i)=>{
+    const m = h.match(/(\d+)\s*FLOOR/);
+    if(m) floorCols[+m[1]] = i;
+  });
+
   projects=[];
   for(let r=2;r<raw.length;r++){
-    const c=raw[r];
-    const sr=String(c[0]||'').trim(),name=String(c[1]||'').trim(),cat=String(c[2]||'').trim(),dr=String(c[3]||'').trim();
-    if(!name||!cat)continue;
-    const da=dr?parseInt(dr.replace(/\D/g,''))||0:0;
-    const fl={};
-    Object.entries(fc).forEach(([i,n])=>{const v=parseInt(String(c[+i]||'').replace(/\D/g,''));if(v>0)fl[n]=v;});
+    const row=raw[r];
+    const name = colName>=0 ? String(row[colName]||'').trim() : '';
+    const cat  = colCat>=0  ? String(row[colCat]||'').trim()  : '';
+    if(!name||!cat) continue;
 
-    // FIX 2: Skip projects that have no floors data AND no total duration possible
-    // Only include projects that have at least one valid floor entry (meaning total duration exists)
-    if(!Object.keys(fl).length)continue;
+    const da  = colDA>=0  ? parseInt(String(row[colDA]||'').replace(/\D/g,''))||0 : 0;
+    const tot = colTot>=0 ? parseInt(String(row[colTot]||'').replace(/\D/g,''))||0 : 0;
 
-    projects.push({sr,name,category:cat,da,floors:fl});
+    // Get floor values
+    const floors={};
+    Object.entries(floorCols).forEach(([fNum,fCol])=>{
+      const v=parseInt(String(row[fCol]||'').replace(/\D/g,''));
+      if(v>0) floors[+fNum]=v;
+    });
+
+    // Skip projects with no total duration (blank in sheet)
+    if(!tot) continue;
+
+    projects.push({name,category:cat,da,floors,tot});
   }
 }
 
@@ -222,15 +245,12 @@ function info(){
   document.getElementById('iFloors').textContent=new Set(projects.flatMap(p=>Object.keys(p.floors).map(Number))).size;
 }
 
-function tcell(da,fd){
-  if(da&&fd) return`<div class="ttot">${da+fd}</div><div class="tsub">days</div>`;
-  if(da)     return`<div class="ttot">${da}</div><div class="tsub">days</div>`;
-  if(fd)     return`<div class="ttot">${fd}</div><div class="tsub">days</div>`;
-  return`<span class="dash">—</span>`;
-}
 const dac=da=>da?`<span class="pill a">${da} days</span>`:`<span class="dash">—</span>`;
 const occ=fd=>fd?`<span class="pill r">${fd} days</span>`:`<span class="dash">—</span>`;
 const fc2=f=>f?`<span class="ftag">${f} Floors</span>`:`<span class="dash">—</span>`;
+function tcell(tot){
+  return tot?`<div class="ttot">${tot}</div><div class="tsub">days</div>`:`<span class="dash">—</span>`;
+}
 
 function calculate(){
   const cat=document.getElementById('catSel').value;
@@ -238,8 +258,7 @@ function calculate(){
 
   let filtered=[...projects];
   if(cat) filtered=filtered.filter(p=>p.category===cat);
-
-  // FIX 1: When floor filter is selected, only show projects that HAVE that exact floor
+  // Floor filter: only show projects that HAVE that exact floor
   if(floor) filtered=filtered.filter(p=>p.floors.hasOwnProperty(floor));
 
   if(!filtered.length){
@@ -256,22 +275,29 @@ function calculate(){
 
   filtered.forEach((p,pi)=>{
     if(floor){
-      // Floor selected: show only that floor row
-      const fd=p.floors[floor];
+      // Show only selected floor row
+      const fd=p.floors[floor]||null;
       const tr=document.createElement('tr');
       if(pi>0)tr.classList.add('gsep');
-      tr.innerHTML=`<td><span class="srno">${p.sr}</span></td><td><div class="pname">${p.name}</div></td><td><span class="pcat">${p.category}</span></td><td class="c">${fc2(floor)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${tcell(p.da,fd)}</td>`;
+      tr.innerHTML=`<td><div class="pname">${p.name}</div></td><td><span class="pcat">${p.category}</span></td><td class="c">${fc2(floor)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${tcell(p.tot)}</td>`;
       tbody.appendChild(tr);rc++;
     } else {
-      // No floor filter: show all floor rows for each project
+      // Show all floor rows
       const fks=Object.keys(p.floors).map(Number).sort((a,b)=>a-b);
-      fks.forEach((f,fi)=>{
-        const fd=p.floors[f];
+      if(!fks.length){
         const tr=document.createElement('tr');
-        if(fi===0&&pi>0)tr.classList.add('gsep');
-        tr.innerHTML=`<td>${fi===0?`<span class="srno">${p.sr}</span>`:''}</td><td>${fi===0?`<div class="pname">${p.name}</div>`:''}</td><td>${fi===0?`<span class="pcat">${p.category}</span>`:''}</td><td class="c">${fc2(f)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${tcell(p.da,fd)}</td>`;
+        if(pi>0)tr.classList.add('gsep');
+        tr.innerHTML=`<td><div class="pname">${p.name}</div></td><td><span class="pcat">${p.category}</span></td><td class="c"><span class="dash">—</span></td><td class="c">${dac(p.da)}</td><td class="c"><span class="dash">—</span></td><td class="r">${tcell(p.tot)}</td>`;
         tbody.appendChild(tr);rc++;
-      });
+      } else {
+        fks.forEach((f,fi)=>{
+          const fd=p.floors[f];
+          const tr=document.createElement('tr');
+          if(fi===0&&pi>0)tr.classList.add('gsep');
+          tr.innerHTML=`<td>${fi===0?`<div class="pname">${p.name}</div>`:''}</td><td>${fi===0?`<span class="pcat">${p.category}</span>`:''}</td><td class="c">${fc2(f)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${fi===0?tcell(p.tot):''}</td>`;
+          tbody.appendChild(tr);rc++;
+        });
+      }
     }
   });
 
@@ -285,7 +311,7 @@ function setLive(ok){const el=document.getElementById('liveStatus');if(ok){el.te
 function ts(){return new Date().toLocaleTimeString('en-IN',{hour12:false});}
 
 loadData();
-setInterval(()=>loadData(true),REFRESH_MS);
+setInterval(loadData,REFRESH_MS);
 </script>
 </body>
 </html>
