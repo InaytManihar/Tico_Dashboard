@@ -34,15 +34,12 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .spin{width:24px;height:24px;margin:0 auto 10px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loader-wrap p{font-size:12px;color:var(--muted);font-weight:500}
-
-/* Summary box - above filters content area */
 .info-box{background:var(--bg);border-radius:12px;padding:14px;margin-bottom:18px}
 .info-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
 .info-row:last-child{border-bottom:none}
 .info-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .info-val{font-size:13px;font-weight:800}
 .info-val.green{color:var(--green)}.info-val.amber{color:var(--amber)}.info-val.def{color:var(--text)}
-
 .main{padding:32px 36px}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;gap:14px;text-align:center}
 .empty-state .ei{font-size:62px;opacity:.18}
@@ -62,10 +59,9 @@ tbody tr:hover{background:#f7f9fd}
 tbody tr.gsep td{border-top:2px solid var(--border)}
 td{padding:12px 15px;font-size:13px;vertical-align:middle}
 td.c{text-align:center}td.r{text-align:right}
-.pname{font-weight:800;font-size:14px;color:var(--text);text-transform:uppercase;letter-spacing:.04em}
+.srno{font-size:13px;font-weight:800;color:var(--muted2)}
 .pcat{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--accent-light);color:var(--accent);white-space:nowrap}
 .ftag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;background:#eef2ff;color:#4f6ef7;white-space:nowrap}
-/* All pills same style */
 .pill{display:inline-block;padding:5px 13px;border-radius:8px;font-weight:700;font-size:13px;white-space:nowrap}
 .pill.a{background:var(--amber-light);color:var(--amber)}
 .pill.r{background:var(--red-light);color:var(--red)}
@@ -97,20 +93,11 @@ td.c{text-align:center}td.r{text-align:right}
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-title">Filters</div>
-
     <div class="loader-wrap" id="sideLoader">
       <div class="spin"></div>
       <p>Connecting to Google Sheets…</p>
     </div>
-
     <div id="filterWrap" style="display:none">
-      <!-- Summary ABOVE filters -->
-      <div class="info-box">
-        <div class="info-row"><span class="info-lbl">Total Projects</span><span class="info-val green" id="iTotal">—</span></div>
-        <div class="info-row"><span class="info-lbl">Categories</span><span class="info-val def" id="iCats">—</span></div>
-        <div class="info-row"><span class="info-lbl">Floor Types</span><span class="info-val amber" id="iFloors">—</span></div>
-      </div>
-
       <div class="filter-block">
         <label class="filter-lbl">Category</label>
         <select class="filter-sel" id="catSel" onchange="calculate()">
@@ -122,6 +109,10 @@ td.c{text-align:center}td.r{text-align:right}
         <select class="filter-sel" id="floorSel" onchange="calculate()">
           <option value="">All Floors</option>
         </select>
+      </div>
+      <div class="info-box">
+        <div class="info-row"><span class="info-lbl">Categories</span><span class="info-val def" id="iCats">—</span></div>
+        <div class="info-row"><span class="info-lbl">Floor Types</span><span class="info-val amber" id="iFloors">—</span></div>
       </div>
     </div>
   </aside>
@@ -140,7 +131,7 @@ td.c{text-align:center}td.r{text-align:right}
         <table>
           <thead>
             <tr>
-              <th>Project</th>
+              <th>SR NO.</th>
               <th>Category</th>
               <th class="c">Floors</th>
               <th class="c">DA → Launch</th>
@@ -191,19 +182,29 @@ function parse(raw){
   if(!raw||raw.length<2)return;
   const mainHeaders=(raw[0]||[]).map(h=>normalize(h));
   const subHeaders=(raw[1]||[]).map(h=>normalize(h));
-  const colName=mainHeaders.indexOf('PROJECT');
-  const colCat=mainHeaders.indexOf('CATEGORY');
-  const colDA=mainHeaders.findIndex(h=>h.includes('DA')&&h.includes('LAUNCH'));
-  const colTot=mainHeaders.findIndex(h=>h.includes('TOTAL')&&h.includes('DURATION'));
+
+  // Column A = SR NO., Column B = CATEGORY
+  // Find columns dynamically
+  let colSrNo = mainHeaders.findIndex(h=>h.includes('SR'));
+  let colCat  = mainHeaders.findIndex(h=>h.includes('CATEGORY'));
+  const colDA = mainHeaders.findIndex(h=>h.includes('DA')&&h.includes('LAUNCH'));
+  const colTot= mainHeaders.findIndex(h=>h.includes('TOTAL')&&h.includes('DURATION'));
+
+  // Fallback: col 0 = SR NO, col 1 = CATEGORY
+  if(colSrNo<0) colSrNo=0;
+  if(colCat<0)  colCat=1;
+
+  // Find floor columns from sub-headers row
   const floorCols={};
   subHeaders.forEach((h,i)=>{const m=h.match(/(\d+)\s*FLOOR/);if(m)floorCols[+m[1]]=i;});
+
   projects=[];
   for(let r=2;r<raw.length;r++){
     const row=raw[r];
-    const name=colName>=0?String(row[colName]||'').trim():'';
-    const cat=colCat>=0?String(row[colCat]||'').trim():'';
-    if(!name||!cat)continue;
-    const da=colDA>=0?parseInt(String(row[colDA]||'').replace(/\D/g,''))||0:0;
+    const srNo=String(row[colSrNo]||'').trim();
+    const cat =String(row[colCat]||'').trim();
+    if(!srNo||!cat)continue;
+    const da =colDA>=0?parseInt(String(row[colDA]||'').replace(/\D/g,''))||0:0;
     const tot=colTot>=0?parseInt(String(row[colTot]||'').replace(/\D/g,''))||0:0;
     const floors={};
     Object.entries(floorCols).forEach(([fNum,fCol])=>{
@@ -211,7 +212,7 @@ function parse(raw){
       if(v>0)floors[+fNum]=v;
     });
     if(!tot)continue;
-    projects.push({name,category:cat,da,floors,tot});
+    projects.push({srNo,category:cat,da,floors,tot});
   }
 }
 
@@ -227,12 +228,10 @@ function drops(){
 }
 
 function info(){
-  document.getElementById('iTotal').textContent=projects.length;
   document.getElementById('iCats').textContent=new Set(projects.map(p=>p.category)).size;
   document.getElementById('iFloors').textContent=new Set(projects.flatMap(p=>Object.keys(p.floors).map(Number))).size;
 }
 
-// All durations use same pill style
 const dac=da=>da?`<span class="pill a">${da} days</span>`:`<span class="dash">—</span>`;
 const occ=fd=>fd?`<span class="pill r">${fd} days</span>`:`<span class="dash">—</span>`;
 const totc=t=>t?`<span class="pill b">${t} days</span>`:`<span class="dash">—</span>`;
@@ -259,21 +258,21 @@ function calculate(){
       const fd=p.floors[floor]||null;
       const tr=document.createElement('tr');
       if(pi>0)tr.classList.add('gsep');
-      tr.innerHTML=`<td><div class="pname">${p.name}</div></td><td><span class="pcat">${p.category}</span></td><td class="c">${fc2(floor)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${totc(p.tot)}</td>`;
+      tr.innerHTML=`<td><span class="srno">${p.srNo}</span></td><td><span class="pcat">${p.category}</span></td><td class="c">${fc2(floor)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${totc(p.tot)}</td>`;
       tbody.appendChild(tr);rc++;
     } else {
       const fks=Object.keys(p.floors).map(Number).sort((a,b)=>a-b);
       if(!fks.length){
         const tr=document.createElement('tr');
         if(pi>0)tr.classList.add('gsep');
-        tr.innerHTML=`<td><div class="pname">${p.name}</div></td><td><span class="pcat">${p.category}</span></td><td class="c"><span class="dash">—</span></td><td class="c">${dac(p.da)}</td><td class="c"><span class="dash">—</span></td><td class="r">${totc(p.tot)}</td>`;
+        tr.innerHTML=`<td><span class="srno">${p.srNo}</span></td><td><span class="pcat">${p.category}</span></td><td class="c"><span class="dash">—</span></td><td class="c">${dac(p.da)}</td><td class="c"><span class="dash">—</span></td><td class="r">${totc(p.tot)}</td>`;
         tbody.appendChild(tr);rc++;
       } else {
         fks.forEach((f,fi)=>{
           const fd=p.floors[f];
           const tr=document.createElement('tr');
           if(fi===0&&pi>0)tr.classList.add('gsep');
-          tr.innerHTML=`<td>${fi===0?`<div class="pname">${p.name}</div>`:''}</td><td>${fi===0?`<span class="pcat">${p.category}</span>`:''}</td><td class="c">${fc2(f)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${fi===0?totc(p.tot):''}</td>`;
+          tr.innerHTML=`<td>${fi===0?`<span class="srno">${p.srNo}</span>`:''}</td><td>${fi===0?`<span class="pcat">${p.category}</span>`:''}</td><td class="c">${fc2(f)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${fi===0?totc(p.tot):''}</td>`;
           tbody.appendChild(tr);rc++;
         });
       }
