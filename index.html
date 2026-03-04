@@ -180,38 +180,28 @@ function normalize(s){return String(s||'').toUpperCase().replace(/\s+/g,' ').tri
 
 function parse(raw){
   if(!raw||raw.length<2)return;
-  const mainHeaders=(raw[0]||[]).map(h=>normalize(h));
-  const subHeaders=(raw[1]||[]).map(h=>normalize(h));
 
-  // Column A = SR NO., Column B = CATEGORY
-  // Find columns dynamically
-  let colSrNo = mainHeaders.findIndex(h=>h.includes('SR'));
-  let colCat  = mainHeaders.findIndex(h=>h.includes('CATEGORY'));
-  const colDA = mainHeaders.findIndex(h=>h.includes('DA')&&h.includes('LAUNCH'));
-  const colTot= mainHeaders.findIndex(h=>h.includes('TOTAL')&&h.includes('DURATION'));
+  // Row 0 = main headers, Row 1 = sub headers (floor columns)
+  // Col 0=SR NO, Col 1=CATEGORY, Col 2=DA-LAUNCH, Col 3=22FLOORS, Col 4=40FLOORS, Col 5=TOTAL DURATION
 
-  // Fallback: col 0 = SR NO, col 1 = CATEGORY
-  if(colSrNo<0) colSrNo=0;
-  if(colCat<0)  colCat=1;
-
-  // Find floor columns from sub-headers row
+  const subHeaders=(raw[1]||[]).map(h=>String(h||'').toUpperCase().trim());
   const floorCols={};
   subHeaders.forEach((h,i)=>{const m=h.match(/(\d+)\s*FLOOR/);if(m)floorCols[+m[1]]=i;});
 
   projects=[];
   for(let r=2;r<raw.length;r++){
     const row=raw[r];
-    const srNo=String(row[colSrNo]||'').trim();
-    const cat =String(row[colCat]||'').trim();
+    const srNo=String(row[0]||'').trim();
+    const cat =String(row[1]||'').trim();
     if(!srNo||!cat)continue;
-    const da =colDA>=0?parseInt(String(row[colDA]||'').replace(/\D/g,''))||0:0;
-    const tot=colTot>=0?parseInt(String(row[colTot]||'').replace(/\D/g,''))||0:0;
+    const da  =parseInt(String(row[2]||'').replace(/\D/g,''))||0;
+    const tot =parseInt(String(row[5]||'').replace(/\D/g,''))||0;
+    if(!tot)continue;
     const floors={};
     Object.entries(floorCols).forEach(([fNum,fCol])=>{
       const v=parseInt(String(row[fCol]||'').replace(/\D/g,''));
       if(v>0)floors[+fNum]=v;
     });
-    if(!tot)continue;
     projects.push({srNo,category:cat,da,floors,tot});
   }
 }
