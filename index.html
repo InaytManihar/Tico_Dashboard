@@ -23,22 +23,26 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .nav-time{font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
 .nav-sync{font-size:11px;color:var(--muted2);font-weight:500}
 .layout{display:grid;grid-template-columns:285px 1fr;min-height:calc(100vh - 62px)}
-.sidebar{background:var(--white);border-right:1px solid var(--border);padding:26px 18px;display:flex;flex-direction:column}
+.sidebar{background:var(--white);border-right:1px solid var(--border);padding:26px 18px;display:flex;flex-direction:column;gap:0}
 .sidebar-title{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:16px;padding-bottom:11px;border-bottom:1px solid var(--border)}
 .filter-block{margin-bottom:15px}
 .filter-lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
-.filter-sel{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238492a6' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:border-color .2s}
+.filter-sel{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;appearance:none;text-transform:uppercase;letter-spacing:.06em;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238492a6' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:border-color .2s}
+.filter-sel option{text-transform:uppercase;letter-spacing:.06em;font-weight:600}
 .filter-sel:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);background-color:var(--white)}
 .loader-wrap{text-align:center;padding:20px 0}
 .spin{width:24px;height:24px;margin:0 auto 10px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loader-wrap p{font-size:12px;color:var(--muted);font-weight:500}
-.info-box{margin-top:auto;padding-top:18px;border-top:1px solid var(--border)}
-.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+
+/* Summary box - above filters content area */
+.info-box{background:var(--bg);border-radius:12px;padding:14px;margin-bottom:18px}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
 .info-row:last-child{border-bottom:none}
 .info-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .info-val{font-size:13px;font-weight:800}
 .info-val.green{color:var(--green)}.info-val.amber{color:var(--amber)}.info-val.def{color:var(--text)}
+
 .main{padding:32px 36px}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;gap:14px;text-align:center}
 .empty-state .ei{font-size:62px;opacity:.18}
@@ -58,14 +62,14 @@ tbody tr:hover{background:#f7f9fd}
 tbody tr.gsep td{border-top:2px solid var(--border)}
 td{padding:12px 15px;font-size:13px;vertical-align:middle}
 td.c{text-align:center}td.r{text-align:right}
-.pname{font-weight:800;font-size:14px;color:var(--text)}
+.pname{font-weight:800;font-size:14px;color:var(--text);text-transform:uppercase;letter-spacing:.04em}
 .pcat{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--accent-light);color:var(--accent);white-space:nowrap}
 .ftag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;background:#eef2ff;color:#4f6ef7;white-space:nowrap}
+/* All pills same style */
 .pill{display:inline-block;padding:5px 13px;border-radius:8px;font-weight:700;font-size:13px;white-space:nowrap}
 .pill.a{background:var(--amber-light);color:var(--amber)}
 .pill.r{background:var(--red-light);color:var(--red)}
-.ttot{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:var(--accent);line-height:1}
-.tsub{font-size:10px;color:var(--muted);margin-top:2px;font-weight:500}
+.pill.b{background:var(--accent-light);color:var(--accent)}
 .dash{color:var(--muted2);font-size:18px}
 .no-data{text-align:center;padding:52px;color:var(--muted);font-size:14px;font-weight:500}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--border)}.navbar,.main{padding-left:18px;padding-right:18px}.main{padding-top:22px;padding-bottom:22px}}
@@ -93,11 +97,20 @@ td.c{text-align:center}td.r{text-align:right}
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-title">Filters</div>
+
     <div class="loader-wrap" id="sideLoader">
       <div class="spin"></div>
       <p>Connecting to Google Sheets…</p>
     </div>
+
     <div id="filterWrap" style="display:none">
+      <!-- Summary ABOVE filters -->
+      <div class="info-box">
+        <div class="info-row"><span class="info-lbl">Total Projects</span><span class="info-val green" id="iTotal">—</span></div>
+        <div class="info-row"><span class="info-lbl">Categories</span><span class="info-val def" id="iCats">—</span></div>
+        <div class="info-row"><span class="info-lbl">Floor Types</span><span class="info-val amber" id="iFloors">—</span></div>
+      </div>
+
       <div class="filter-block">
         <label class="filter-lbl">Category</label>
         <select class="filter-sel" id="catSel" onchange="calculate()">
@@ -110,11 +123,6 @@ td.c{text-align:center}td.r{text-align:right}
           <option value="">All Floors</option>
         </select>
       </div>
-    </div>
-    <div class="info-box">
-      <div class="info-row"><span class="info-lbl">Total Projects</span><span class="info-val green" id="iTotal">—</span></div>
-      <div class="info-row"><span class="info-lbl">Categories</span><span class="info-val def" id="iCats">—</span></div>
-      <div class="info-row"><span class="info-lbl">Floor Types</span><span class="info-val amber" id="iFloors">—</span></div>
     </div>
   </aside>
 
@@ -163,10 +171,7 @@ async function loadData(){
     const sig=JSON.stringify(raw);
     if(sig!==lastSig){
       lastSig=sig;
-      parse(raw);
-      drops();
-      info();
-      calculate();
+      parse(raw);drops();info();calculate();
     }
     setLive(true);
     document.getElementById('sideLoader').style.display='none';
@@ -180,50 +185,32 @@ async function loadData(){
   }
 }
 
-function normalize(s){
-  return String(s||'').toUpperCase().replace(/\s+/g,' ').trim();
-}
+function normalize(s){return String(s||'').toUpperCase().replace(/\s+/g,' ').trim();}
 
 function parse(raw){
   if(!raw||raw.length<2)return;
-
-  // Row 0 = main headers, Row 1 = sub-headers (floor labels)
-  const mainHeaders = (raw[0]||[]).map(h=>normalize(h));
-  const subHeaders  = (raw[1]||[]).map(h=>normalize(h));
-
-  // Find column indexes by header name
-  const colName = mainHeaders.indexOf('PROJECT');
-  const colCat  = mainHeaders.indexOf('CATEGORY');
-  const colDA   = mainHeaders.findIndex(h=>h.includes('DA') && h.includes('LAUNCH'));
-  const colTot  = mainHeaders.findIndex(h=>h.includes('TOTAL') && h.includes('DURATION'));
-
-  // Find floor columns from sub-headers (row 1): "14 FLOORS", "22 FLOORS", "40 FLOORS" etc.
-  const floorCols = {}; // { floorNumber: colIndex }
-  subHeaders.forEach((h,i)=>{
-    const m = h.match(/(\d+)\s*FLOOR/);
-    if(m) floorCols[+m[1]] = i;
-  });
-
+  const mainHeaders=(raw[0]||[]).map(h=>normalize(h));
+  const subHeaders=(raw[1]||[]).map(h=>normalize(h));
+  const colName=mainHeaders.indexOf('PROJECT');
+  const colCat=mainHeaders.indexOf('CATEGORY');
+  const colDA=mainHeaders.findIndex(h=>h.includes('DA')&&h.includes('LAUNCH'));
+  const colTot=mainHeaders.findIndex(h=>h.includes('TOTAL')&&h.includes('DURATION'));
+  const floorCols={};
+  subHeaders.forEach((h,i)=>{const m=h.match(/(\d+)\s*FLOOR/);if(m)floorCols[+m[1]]=i;});
   projects=[];
   for(let r=2;r<raw.length;r++){
     const row=raw[r];
-    const name = colName>=0 ? String(row[colName]||'').trim() : '';
-    const cat  = colCat>=0  ? String(row[colCat]||'').trim()  : '';
-    if(!name||!cat) continue;
-
-    const da  = colDA>=0  ? parseInt(String(row[colDA]||'').replace(/\D/g,''))||0 : 0;
-    const tot = colTot>=0 ? parseInt(String(row[colTot]||'').replace(/\D/g,''))||0 : 0;
-
-    // Get floor values
+    const name=colName>=0?String(row[colName]||'').trim():'';
+    const cat=colCat>=0?String(row[colCat]||'').trim():'';
+    if(!name||!cat)continue;
+    const da=colDA>=0?parseInt(String(row[colDA]||'').replace(/\D/g,''))||0:0;
+    const tot=colTot>=0?parseInt(String(row[colTot]||'').replace(/\D/g,''))||0:0;
     const floors={};
     Object.entries(floorCols).forEach(([fNum,fCol])=>{
       const v=parseInt(String(row[fCol]||'').replace(/\D/g,''));
-      if(v>0) floors[+fNum]=v;
+      if(v>0)floors[+fNum]=v;
     });
-
-    // Skip projects with no total duration (blank in sheet)
-    if(!tot) continue;
-
+    if(!tot)continue;
     projects.push({name,category:cat,da,floors,tot});
   }
 }
@@ -245,22 +232,18 @@ function info(){
   document.getElementById('iFloors').textContent=new Set(projects.flatMap(p=>Object.keys(p.floors).map(Number))).size;
 }
 
+// All durations use same pill style
 const dac=da=>da?`<span class="pill a">${da} days</span>`:`<span class="dash">—</span>`;
 const occ=fd=>fd?`<span class="pill r">${fd} days</span>`:`<span class="dash">—</span>`;
+const totc=t=>t?`<span class="pill b">${t} days</span>`:`<span class="dash">—</span>`;
 const fc2=f=>f?`<span class="ftag">${f} Floors</span>`:`<span class="dash">—</span>`;
-function tcell(tot){
-  return tot?`<div class="ttot">${tot}</div><div class="tsub">days</div>`:`<span class="dash">—</span>`;
-}
 
 function calculate(){
   const cat=document.getElementById('catSel').value;
   const floor=parseInt(document.getElementById('floorSel').value)||null;
-
   let filtered=[...projects];
-  if(cat) filtered=filtered.filter(p=>p.category===cat);
-  // Floor filter: only show projects that HAVE that exact floor
-  if(floor) filtered=filtered.filter(p=>p.floors.hasOwnProperty(floor));
-
+  if(cat)filtered=filtered.filter(p=>p.category===cat);
+  if(floor)filtered=filtered.filter(p=>p.floors.hasOwnProperty(floor));
   if(!filtered.length){
     document.getElementById('emptyState').style.display='flex';
     document.getElementById('emptyState').querySelector('.et').textContent='No projects found';
@@ -268,39 +251,34 @@ function calculate(){
     document.getElementById('results').style.display='none';
     return;
   }
-
   const tbody=document.getElementById('tbody');
   tbody.innerHTML='';
   let rc=0;
-
   filtered.forEach((p,pi)=>{
     if(floor){
-      // Show only selected floor row
       const fd=p.floors[floor]||null;
       const tr=document.createElement('tr');
       if(pi>0)tr.classList.add('gsep');
-      tr.innerHTML=`<td><div class="pname">${p.name}</div></td><td><span class="pcat">${p.category}</span></td><td class="c">${fc2(floor)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${tcell(p.tot)}</td>`;
+      tr.innerHTML=`<td><div class="pname">${p.name}</div></td><td><span class="pcat">${p.category}</span></td><td class="c">${fc2(floor)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${totc(p.tot)}</td>`;
       tbody.appendChild(tr);rc++;
     } else {
-      // Show all floor rows
       const fks=Object.keys(p.floors).map(Number).sort((a,b)=>a-b);
       if(!fks.length){
         const tr=document.createElement('tr');
         if(pi>0)tr.classList.add('gsep');
-        tr.innerHTML=`<td><div class="pname">${p.name}</div></td><td><span class="pcat">${p.category}</span></td><td class="c"><span class="dash">—</span></td><td class="c">${dac(p.da)}</td><td class="c"><span class="dash">—</span></td><td class="r">${tcell(p.tot)}</td>`;
+        tr.innerHTML=`<td><div class="pname">${p.name}</div></td><td><span class="pcat">${p.category}</span></td><td class="c"><span class="dash">—</span></td><td class="c">${dac(p.da)}</td><td class="c"><span class="dash">—</span></td><td class="r">${totc(p.tot)}</td>`;
         tbody.appendChild(tr);rc++;
       } else {
         fks.forEach((f,fi)=>{
           const fd=p.floors[f];
           const tr=document.createElement('tr');
           if(fi===0&&pi>0)tr.classList.add('gsep');
-          tr.innerHTML=`<td>${fi===0?`<div class="pname">${p.name}</div>`:''}</td><td>${fi===0?`<span class="pcat">${p.category}</span>`:''}</td><td class="c">${fc2(f)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${fi===0?tcell(p.tot):''}</td>`;
+          tr.innerHTML=`<td>${fi===0?`<div class="pname">${p.name}</div>`:''}</td><td>${fi===0?`<span class="pcat">${p.category}</span>`:''}</td><td class="c">${fc2(f)}</td><td class="c">${dac(p.da)}</td><td class="c">${occ(fd)}</td><td class="r">${fi===0?totc(p.tot):''}</td>`;
           tbody.appendChild(tr);rc++;
         });
       }
     }
   });
-
   document.getElementById('noData').style.display=rc?'none':'block';
   document.getElementById('projCount').textContent=filtered.length;
   document.getElementById('emptyState').style.display='none';
